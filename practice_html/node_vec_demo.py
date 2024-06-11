@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from node2vec import Node2Vec
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
 
 def convert_html_to_graph(html_doc):
     soup = BeautifulSoup(html_doc, 'html.parser')
@@ -49,9 +50,26 @@ node_embeddings = {node: model.wv[str(node)] for node in graph.nodes if str(node
 # Print node embeddings
 print(node_embeddings)
 
+# Convert embeddings to a NumPy array and labels
+embedding_vectors = np.array(list(node_embeddings.values()))
+labels = list(node_embeddings.keys())
+
+# Reduce dimensions using t-SNE
+perplexity = min(embedding_vectors.shape[0] - 1, 10)  # Adjust perplexity to be less than the number of samples
+tsne_model = TSNE(n_components=2, perplexity=perplexity, random_state=42)
+embeddings_2d = tsne_model.fit_transform(embedding_vectors)
+
 # Visualize the graph
 plt.figure(figsize=(10, 10))
-pos = nx.spring_layout(graph)
+plt.title("Node2Vec model Graph Visualization") 
+pos = nx.spring_layout(graph, k=0.15)  # Increase k to reduce overlap
 nx.draw(graph, pos, with_labels=True, node_size=700, node_color="skyblue", font_size=10, font_color="black")
-plt.title("Graph Visualization")
+plt.show()
+
+# Visualize the embeddings
+plt.figure(figsize=(10, 10))
+plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], c='blue', edgecolors='k')
+for i, label in enumerate(labels):
+    plt.annotate(label, (embeddings_2d[i, 0], embeddings_2d[i, 1]), textcoords="offset points", xytext=(0, 10), ha='center')
+plt.title("t-SNE Visualization of Node2Vec Embeddings")
 plt.show()
