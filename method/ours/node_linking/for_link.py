@@ -1,15 +1,21 @@
-from .span_ordered_dict import create_2d_span_ordered_dict
-from .for_link import create_for_links
-from .parent_child_link import create_parent_child_links
-from .neighbor_link import create_left_right_links, create_top_bottom_links
+from method.ours.relation_graph import RelationEdge, EdgeType
 
 
-def create_base_links(relation_graph):
-    spans_2d = create_2d_span_ordered_dict(relation_graph)
-    
-    relation_graph = create_for_links(relation_graph)
-    relation_graph = create_parent_child_links(spans_2d, relation_graph)
-    relation_graph = create_left_right_links(spans_2d, relation_graph)
-    relation_graph = create_top_bottom_links(spans_2d, relation_graph)
+def create_for_links(relation_graph):
+    for node in relation_graph.nodes():
+        if 'for' in node.element.attrs:
+            try:
+                source = relation_graph.get_node(node.get_id())
+
+                for_id = node.element.attrs['for']
+                target = relation_graph.get_node(for_id)
+
+                edge = RelationEdge(source, target, EdgeType.FOR)
+                relation_graph.add_edge(edge)
+
+                reverse_edge = RelationEdge(target, source, EdgeType.FOR)
+                relation_graph.add_edge(reverse_edge)
+            except Exception as e:
+                print(e)
 
     return relation_graph

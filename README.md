@@ -16,3 +16,12 @@ https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/data
 
 Creating Dataset:
 https://pytorch-geometric.readthedocs.io/en/latest/notes/create_dataset.html
+
+
+# Keep Docs:
+- textembedding.py [x]
+- similarity
+
+pip install stellargraph
+
+- node2vec.py => graphsage.py

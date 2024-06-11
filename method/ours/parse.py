@@ -4,7 +4,7 @@ from method.ours.utils import embed_properties_into_html
 from method.ours.preprocessing import get_processable_nodes
 from method.ours.graph_embedding import create_node2vec_model
 from method.ours.relation_graph import create_relation_graph
-from method.ours.node_linking import create_base_links
+from method.ours.node_linking import create_base_links # no show
 from method.ours.similarity import add_similarity_scores_to_graph
 from method.ours.edge_pruning import (
     prune_relation_graph_extra_edges,
