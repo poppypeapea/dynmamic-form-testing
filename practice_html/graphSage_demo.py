@@ -66,11 +66,13 @@ def generate_node_features(graph):
     for node in graph.nodes:
         soup_node = BeautifulSoup(node, 'html.parser').find()
         tag = soup_node.name if soup_node else 'other'
-        if soup_node and soup_node.string:
+        if soup_node and soup_node.string: # features of the embeddings
             graph.nodes[node]['feature'] = get_ada_embedding(soup_node.string)
+            graph.nodes[node]['label'] = soup_node.string  # Store the string as label
         else:
             graph.nodes[node]['feature'] = zero_vector
-        graph.nodes[node]['label'] = labels.get(tag, labels['other'])
+            graph.nodes[node]['label'] = ''  # Empty string if no inner text
+        graph.nodes[node]['class'] = labels.get(tag, labels['other'])
     return graph
 
 def nx_to_torch_geometric(graph):
@@ -83,8 +85,11 @@ def nx_to_torch_geometric(graph):
     # Extract features from nodes
     features = torch.tensor([graph.nodes[node]['feature'] for node in nodes], dtype=torch.float)
     
-    # Use the labels generated in generate_node_features
-    labels = torch.tensor([graph.nodes[node]['label'] for node in nodes], dtype=torch.long)
+    # Use the class labels generated in generate_node_features
+    class_labels = torch.tensor([graph.nodes[node]['class'] for node in nodes], dtype=torch.long)
+    
+    # Extract string labels for visualization
+    string_labels = [graph.nodes[node]['label'] for node in nodes]
 
     # Create masks for training, validation, and testing
     train_mask = torch.zeros(len(nodes), dtype=torch.bool)
@@ -94,7 +99,8 @@ def nx_to_torch_geometric(graph):
     # For simplicity, use all nodes for training
     train_mask[:] = True
 
-    data = Data(x=features, edge_index=edge_index, y=labels, train_mask=train_mask, val_mask=val_mask, test_mask=test_mask)
+    data = Data(x=features, edge_index=edge_index, y=class_labels, train_mask=train_mask, val_mask=val_mask, test_mask=test_mask)
+    data.string_labels = string_labels  # Add string labels to data
     return data
 
 # Ensure file path is correct
@@ -115,7 +121,7 @@ data = nx_to_torch_geometric(graph)
 plt.figure(figsize=(10, 10))
 plt.title("HTML DOM Tree Graph Visualization")
 pos = nx.spring_layout(graph, k=0.15)  # Increase k to reduce overlap
-nx.draw(graph, pos, with_labels=True, node_size=700, node_color=data.y.numpy(), cmap='viridis', font_size=10, font_color="black")
+nx.draw(graph, pos, with_labels=True, labels={node: data.string_labels[i] for i, node in enumerate(graph.nodes)}, node_size=700, node_color=data.y.numpy(), cmap='viridis', font_size=10, font_color="black")
 plt.show()
 
 # Create a GraphSAGE model
@@ -138,5 +144,10 @@ embeddings_2d = tsne_model.fit_transform(embeddings)
 plt.figure(figsize=(10, 10))
 plt.title("GraphSAGE Embeddings Visualization")
 plt.scatter(embeddings_2d[:, 0], embeddings_2d[:, 1], c=data.y.numpy(), cmap='viridis', s=20)
+
+# Add labels to the scatter plot
+for i, label in enumerate(data.string_labels):
+    plt.annotate(label, (embeddings_2d[i, 0], embeddings_2d[i, 1]))
+
 plt.colorbar()
 plt.show()
