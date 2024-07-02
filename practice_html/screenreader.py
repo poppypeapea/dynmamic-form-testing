@@ -21,7 +21,7 @@ def get_ada_embedding(text):
     return openai.Embedding.create(input=[text], model='text-embedding-ada-002').data[0].embedding
 
 def get_detailed_description(element, context):
-    prompt = f"Given the context '{context}', provide a detailed description for the following HTML element in 50 words based on the specific html: {element}. Consider the structure, purpose, and user interactions."
+    prompt = f"Given the related nodes context '{context}', provide a detailed description for the following HTML element in 50 words based on the specific html: {element}."
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
@@ -148,45 +148,36 @@ plt.show()
 
 # Find the "see more" element and its context
 context_mapping = {}
-for idx, node in enumerate(graph.nodes):
-    soup_node = BeautifulSoup(node, 'html.parser').find()
-    if soup_node:
-        element_html = str(soup_node)
-        context_mapping[element_html] = embeddings[idx]
+node_names = list(graph.nodes)
 
 # Calculate cosine similarity between each node and "see more" node
 see_more_embedding = None
-see_more_idx = None
+see_more_name = None
+related_nodes = []
 
-for idx, node in enumerate(graph.nodes):
+for idx, node in enumerate(node_names):
     soup_node = BeautifulSoup(node, 'html.parser').find()
     if soup_node and 'see more' in soup_node.get_text().lower():
         see_more_embedding = embeddings[idx]
-        see_more_idx = idx
+        see_more_name = node
         break
 
 if see_more_embedding is not None:
     similarities = {}
     for idx, embedding in enumerate(embeddings):
         similarity = cosine_similarity([embedding], [see_more_embedding])[0][0]
-        similarities[idx] = similarity
+        similarities[node_names[idx]] = similarity
+        if similarity > 0.95:
+            related_nodes.append(node_names[idx])
 
-    # Print cosine similarities
-    for idx, similarity in similarities.items():
-        print(f"Node {idx, node} - Cosine Similarity: {similarity:.4f}")
+    # Print cosine similarities with node names
+    for name, similarity in similarities.items():
+        soup_name = BeautifulSoup(name, 'html.parser').find()
+        node_name = soup_name.name if soup_name else name
+        print(f"Node: {node_name} - Cosine Similarity: {similarity:.4f}")
 
-'''
-# Generate detailed description for the "see more" element with related products context
-if see_more_idx is not None:
-    soup_node = BeautifulSoup(list(graph.nodes)[see_more_idx], 'html.parser').find()
-    if soup_node:
-        # Get related products context
-        related_products = []
-        for sibling in soup_node.parent.find_all_previous():
-            if sibling.name == 'div' and sibling.get('class') == ['item']:
-                related_products.append(sibling.get_text())
-
-        context = " ".join(related_products)
-        description = get_detailed_description('see more', context)
-        print(f"Element: {'see more'}\nDescription: {description}\n")
-'''
+# Generate detailed description for the "see more" element with related nodes context
+if see_more_name is not None:
+    context = " ".join([BeautifulSoup(node, 'html.parser').get_text() for node in related_nodes])
+    description = get_detailed_description('see more', context)
+    print(f"Element: {'see more'}\nDescription: {description}\n")
