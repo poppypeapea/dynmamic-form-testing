@@ -1,48 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Complex Example Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice HTML</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .section {
+            display: flex;
+            flex-direction: row;
+            margin: 20px 0;
+        }
+        .item {
+            margin: 0 10px;
+            text-align: center;
+        }
+        .item img {
+            width: 150px;
+            height: 150px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Complex Example Page</h1>
-    </header>
-    <nav>
-        <ul>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#about">About</a></li>
-        </ul>
-    </nav>
-    <section id="services">
-        <h2>Our Services</h2>
-        <div class="service" id="service1">
-            <h3>Service 1</h3>
-            <p>Details of service 1.</p>
+    <div class="container">
+        <h1>Pick up where you left off</h1>
+        <div class="section" id="products">
+            <div class="item" id="product1">
+                <img src="imgs/mouse1.png" alt="Logitech G402 Hyperion Fury">
+                <p>Logitech G402 Hyperion Fury</p>
+            </div>
+            <div class="item" id="product2">
+                <img src="imgs/mouse2.png" alt="Razer DeathAdder V3">
+                <p>Razer DeathAdder V3</p>
+            </div>
+            <div class="item" id="product3">
+                <img src="imgs/mouse3.png" alt="Logitech G305 LIGHTSPEED">
+                <p>Logitech G305 LIGHTSPEED</p>
+            </div>
+            <div class="item" id="product4">
+                <img src="imgs/mouse4.png" alt="Logitech G502 X Plus">
+                <p>Logitech G502 X Plus</p>
+            </div>
         </div>
-        <div class="service" id="service2">
-            <h3>Service 2</h3>
-            <p>Details of service 2.</p>
-        </div>
-        <div class="service" id="service3">
-            <h3>Service 3</h3>
-            <p>Details of service 3.</p>
-        </div>
-    </section>
-    <section id="about">
-        <h2>About Us</h2>
-        <div class="team" id="team1">
-            <h3>Team Member 1</h3>
-            <p>Details about team member 1.</p>
-        </div>
-        <div class="team" id="team2">
-            <h3>Team Member 2</h3>
-            <p>Details about team member 2.</p>
-        </div>
-    </section>
-    <footer>
-        <p>Footer content here.</p>
-    </footer>
+        <a href="see-more.html" id="see-more">See more</a>
+    </div>
 </body>
 </html>
