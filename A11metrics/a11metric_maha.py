@@ -111,8 +111,7 @@ def compare_graphs(normal_graph, impaired_graph, normal_embeddings, impaired_emb
             normal_dist = normal_dist_matrix[i]
             impaired_dist = impaired_dist_matrix[j]
             print(f"Node {node}: Normal Mean Distance = {np.mean(normal_dist)}, Impaired Mean Distance = {np.mean(impaired_dist)}")  # 调试输出
-            if np.mean(normal_dist) > 0.01 and np.mean(impaired_dist) < 0.01:
-                discrepancies.append((node, np.mean(normal_dist), np.mean(impaired_dist)))
+            discrepancies.append((node, np.mean(normal_dist), np.mean(impaired_dist)))
     
     return discrepancies
 
@@ -185,8 +184,4 @@ print("Discrepancies between normal and impaired graphs (Manhattan):")
 for node, normal_dist, impaired_dist in discrepancies:
     print(f"Node {node}: Normal distance = {normal_dist:.2f}, Impaired distance = {impaired_dist:.2f}")
 
-# Visualize embeddings
-visualize_embeddings(initial_normal_embeddings, "Initial Normal Embeddings")
-visualize_embeddings(trained_normal_embeddings, "Trained Normal Embeddings")
-visualize_embeddings(initial_impaired_embeddings, "Initial Impaired Embeddings")
-visualize_embeddings(trained_impaired_embeddings, "Trained Impaired Embeddings")
+# Visualize embeddi
