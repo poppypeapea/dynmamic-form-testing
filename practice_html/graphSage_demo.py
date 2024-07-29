@@ -8,16 +8,16 @@ from torch_geometric.loader import DataLoader
 from sklearn.manifold import TSNE
 import openai
 from utils.edge_rules import add_parent_child_edges, add_label_input_edges, add_next_sibling_edges  
-from utils.GraphSAGE import GraphSAGE
+from utils.graphsage import GraphSAGE
 from dotenv import load_dotenv
 
 load_dotenv() 
 
 api_key = os.getenv("OPENAI_API_KEY")
-client = openai.OpenAI(api_key=api_key)
+openai.api_key = api_key
 
 def get_ada_embedding(text):
-    return client.embeddings.create(input=[text], model='text-embedding-ada-002').data[0].embedding
+    return openai.Embedding.create(input=[text], model='text-embedding-ada-002').data[0].embedding
 
 # HTML to Graph Conversion Functions
 def convert_html_to_graph(html_doc):

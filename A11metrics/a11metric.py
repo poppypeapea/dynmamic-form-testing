@@ -28,7 +28,7 @@ def convert_html_to_graph(html_doc):
     return graph
 
 def generate_node_features(graph):
-    ada_embedding_size = 1536
+    ada_embedding_size = 1536 
     zero_vector = [0] * ada_embedding_size
 
     for node in graph.nodes:
@@ -71,18 +71,47 @@ def nx_to_torch_geometric(graph):
     data = Data(x=features, edge_index=edge_index, y=labels, train_mask=train_mask, val_mask=val_mask, test_mask=test_mask)
     return data
 
-def add_cosine_similarity_weights(graph, embeddings):
-    node_list = list(graph.nodes)
-    cosine_sim_matrix = cosine_similarity(embeddings)
+# # To add cosine similarity weights between all pairs of nodes in the graph.
+# def add_cosine_similarity_weights(graph, embeddings):
+#     node_list = list(graph.nodes)
+#     cosine_sim_matrix = cosine_similarity(embeddings)
     
-    for i, src in enumerate(node_list):
-        for j, dst in enumerate(node_list):
-            if i != j:
-                similarity = cosine_sim_matrix[i, j]
-                graph.add_edge(src, dst, weight=similarity)
-    return graph
+#     for i, src in enumerate(node_list):
+#         for j, dst in enumerate(node_list):
+#             if i != j:
+#                 similarity = cosine_sim_matrix[i, j]
+#                 graph.add_edge(src, dst, weight=similarity)
+#     return graph
 
-def calculate_similarities(data, model):
+# def calculate_similarities(data, model):
+#     loader = DataLoader([data], batch_size=1)
+#     model.eval()
+#     initial_embeddings = model(data.x, data.edge_index).detach().numpy()
+#     model.train()
+#     model.fit(data, loader, epochs=100)
+#     model.eval()
+#     trained_embeddings = model(data.x, data.edge_index).detach().numpy()
+#     return initial_embeddings, trained_embeddings
+
+# def compare_graphs(normal_graph, impaired_graph, normal_embeddings, impaired_embeddings):
+#     normal_sim_matrix = cosine_similarity(normal_embeddings)
+#     impaired_sim_matrix = cosine_similarity(impaired_embeddings)
+    
+#     discrepancies = []
+    
+#     for i in range(len(normal_sim_matrix)):
+#         for j in range(i + 1, len(normal_sim_matrix)):
+#             normal_sim = normal_sim_matrix[i, j]
+#             impaired_sim = impaired_sim_matrix[i, j]
+#             if normal_sim > 0.0000000000000000000000000000000000002: # 更严格的阈值
+#                 discrepancies.append((i, j, normal_sim, impaired_sim))
+    
+#     return discrepancies
+
+
+import numpy as np
+
+def calculate_similarities_euclidean(data, model):
     loader = DataLoader([data], batch_size=1)
     model.eval()
     initial_embeddings = model(data.x, data.edge_index).detach().numpy()
@@ -92,19 +121,23 @@ def calculate_similarities(data, model):
     trained_embeddings = model(data.x, data.edge_index).detach().numpy()
     return initial_embeddings, trained_embeddings
 
-def compare_graphs(normal_graph, impaired_graph, normal_embeddings, impaired_embeddings):
-    normal_sim_matrix = cosine_similarity(normal_embeddings)
-    impaired_sim_matrix = cosine_similarity(impaired_embeddings)
-    
+def add_euclidean_distance_weights(graph, embeddings):
+    node_list = list(graph.nodes)
+    for i, src in enumerate(node_list):
+        for j, dst in enumerate(node_list):
+            if i != j:
+                distance = np.linalg.norm(embeddings[i] - embeddings[j])
+                graph.add_edge(src, dst, weight=distance)
+    return graph
+
+def compare_graphs_euclidean(normal_graph, impaired_graph, normal_embeddings, impaired_embeddings):
     discrepancies = []
-    
-    for i in range(len(normal_sim_matrix)):
-        for j in range(i + 1, len(normal_sim_matrix)):
-            normal_sim = normal_sim_matrix[i, j]
-            impaired_sim = impaired_sim_matrix[i, j]
-            if normal_sim > 0.1 and impaired_sim < 0.1:  # Adjusted thresholds
-                discrepancies.append((i, j, normal_sim, impaired_sim))
-    
+    for i in range(len(normal_embeddings)):
+        for j in range(i + 1, len(normal_embeddings)):
+            normal_dist = np.linalg.norm(normal_embeddings[i] - normal_embeddings[j])
+            impaired_dist = np.linalg.norm(impaired_embeddings[i] - impaired_embeddings[j])
+            if normal_dist < 0.1 and impaired_dist > 0.1:  # Adjusted thresholds
+                discrepancies.append((i, j, normal_dist, impaired_dist))
     return discrepancies
 
 def visualize_embeddings(embeddings, title):
@@ -153,8 +186,8 @@ print(f"Test Mask (Impaired): {impaired_data.test_mask}")
 print(f"Labels (Impaired): {impaired_data.y}")
 
 # Calculate similarities
-initial_normal_embeddings, trained_normal_embeddings = calculate_similarities(normal_data, GraphSAGE(dim_in=normal_data.num_node_features, dim_h=128, dim_out=128))
-initial_impaired_embeddings, trained_impaired_embeddings = calculate_similarities(impaired_data, GraphSAGE(dim_in=impaired_data.num_node_features, dim_h=128, dim_out=128))
+initial_normal_embeddings, trained_normal_embeddings = calculate_similarities_euclidean(normal_data, GraphSAGE(dim_in=normal_data.num_node_features, dim_h=128, dim_out=128))
+initial_impaired_embeddings, trained_impaired_embeddings = calculate_similarities_euclidean(impaired_data, GraphSAGE(dim_in=impaired_data.num_node_features, dim_h=128, dim_out=128))
 
 # Print embeddings before and after training
 print("Initial Normal Embeddings:\n", initial_normal_embeddings)
@@ -163,8 +196,8 @@ print("Initial Impaired Embeddings:\n", initial_impaired_embeddings)
 print("Trained Impaired Embeddings:\n", trained_impaired_embeddings)
 
 # Add cosine similarity weights
-normal_graph = add_cosine_similarity_weights(normal_graph, trained_normal_embeddings)
-impaired_graph = add_cosine_similarity_weights(impaired_graph, trained_impaired_embeddings)
+normal_graph = add_euclidean_distance_weights(normal_graph, trained_normal_embeddings)
+impaired_graph = add_euclidean_distance_weights(impaired_graph, trained_impaired_embeddings)
 
 # Print similarity matrices for debugging
 normal_sim_matrix = cosine_similarity(trained_normal_embeddings)
@@ -173,7 +206,7 @@ print("Normal Similarity Matrix:\n", normal_sim_matrix)
 print("Impaired Similarity Matrix:\n", impaired_sim_matrix)
 
 # Compare graphs
-discrepancies = compare_graphs(normal_graph, impaired_graph, trained_normal_embeddings, trained_impaired_embeddings)
+discrepancies = compare_graphs_euclidean(normal_graph, impaired_graph, trained_normal_embeddings, trained_impaired_embeddings)
 
 # Print discrepancies
 print("Discrepancies between normal and impaired graphs:")

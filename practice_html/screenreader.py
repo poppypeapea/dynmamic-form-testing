@@ -20,8 +20,8 @@ openai.api_key = api_key
 def get_ada_embedding(text):
     return openai.Embedding.create(input=[text], model='text-embedding-ada-002').data[0].embedding
 
-def get_detailed_description(element, context):
-    prompt = f"Given the related nodes context '{context}', provide a detailed description for the following HTML element in 50 words based on the specific html: {element}."
+def get_detailed_description(element, related_nodes_context):
+    prompt = f"Given the context of the related nodes: '{related_nodes_context}', provide a detailed description for the following HTML element: {element}. Consider the structure, purpose, and user interactions."
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[

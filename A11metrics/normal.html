@@ -2,45 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Normal Page</title>
+    <title>Accessible Web Page</title>
 </head>
 <body>
     <header>
-        <h1>Welcome to Our Website</h1>
+        <h1>Welcome to Our Accessible Web Page</h1>
         <nav>
             <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#content">Skip to content</a></li>
+                <li><a href="#contact">Contact Us</a></li>
             </ul>
         </nav>
     </header>
-    <main>
-        <section id="home">
-            <h2>Home</h2>
-            <p>Welcome to our homepage. We are glad to have you here.</p>
-            <img src="home.jpg" alt="Home Image">
-        </section>
-        <section id="about">
+    <main id="content">
+        <section>
             <h2>About Us</h2>
-            <p>We are a company dedicated to providing the best services to our customers.</p>
-            <img src="about.jpg" alt="About Us Image">
+            <p>We strive to create accessible web pages for everyone.</p>
+            <img src="example1.jpg" alt="Example Image 1">
         </section>
-        <section id="services">
-            <h2>Our Services</h2>
-            <p>We offer a range of services to help you achieve the results you’re after.</p>
-            <img src="services.jpg" alt="Our Services">
-        </section>
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <p>Feel free to reach out to us through our contact page.</p>
-            <img src="contact.jpg" alt="Contact Image">
+        <section>
+            <h2>Services</h2>
+            <p>We offer web development services that focus on accessibility.</p>
+            <img src="example2.jpg" alt="Example Image 2">
         </section>
     </main>
     <footer>
-        <p>&copy; 2023 Our Website</p>
+        <address id="contact">
+            Contact us at <a href="mailto:info@example.com">info@example.com</a>.
+        </address>
     </footer>
 </body>
 </html>

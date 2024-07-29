@@ -2,45 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessible Page</title>
+    <title>Non-Accessible Web Page</title>
 </head>
 <body>
     <header>
-        <h1>Welcome to Our Accessible Website</h1>
+        <h1>Welcome to Our Web Page</h1>
         <nav>
             <ul>
-                <li><a href="#home" aria-label="Home Page">Home</a></li>
-                <li><a href="#about" aria-label="Learn About Us">About</a></li>
-                <li><a href="#services" aria-label="View Our Services">Services</a></li>
-                <li><a href="#contact" aria-label="Contact Information">Contact</a></li>
+                <li><a href="#content">Content</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
     </header>
-    <main>
-        <section id="home">
-            <h2>Home Section</h2>
-            <p>Welcome to our accessible homepage. We are thrilled to have you here.</p>
-            <img src="home.jpg" alt="A welcoming home environment">
+    <main id="content">
+        <section>
+            <h2>About Us</h2>
+            <p>We create web pages.</p>
+            <img src="example1.jpg">
         </section>
-        <section id="about">
-            <h2>About Our Company</h2>
-            <p>We are an organization committed to providing exceptional services to our clients.</p>
-            <img src="about.jpg" alt="Our dedicated team in action">
+        <section>
+            <h3>Services</h3>
+            <p>We offer web development services.</p>
+            <img src="example2.jpg">
         </section>
-        <section id="services">
-            <h2>Services We Offer</h2>
-            <p>We provide a variety of services to help you achieve your desired outcomes.</p>
-            <img src="services.jpg" alt="Illustration of our services">
+        <section>
+            <h1>Improper Heading</h1>
+            <p>Another paragraph with no proper nesting.</p>
         </section>
-        <section id="contact">
-            <h2>Contact Information</h2>
-            <p>Reach out to us via our contact page for more information.</p>
-            <img src="contact.jpg" alt="Contact us through email or phone">
-        </section>
+        <div>
+            <p>Text without heading</p>
+        </div>
     </main>
     <footer>
-        <p>&copy; 2023 Our Accessible Website</p>
+        <address id="contact">
+            <a href="mailto:info@example.com">Contact us</a>.
+        </address>
     </footer>
 </body>
 </html>

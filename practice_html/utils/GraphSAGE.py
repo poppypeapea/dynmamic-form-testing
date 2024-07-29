@@ -32,15 +32,20 @@ class GraphSAGE(torch.nn.Module):
             for batch in train_loader:
                 optimizer.zero_grad()
                 out = self(batch.x, batch.edge_index)
-                loss = criterion(out[batch.train_mask], batch.y[batch.train_mask])
-                total_loss += loss.item()
-                acc += accuracy(out[batch.train_mask].argmax(dim=1), batch.y[batch.train_mask])
-                loss.backward()
-                optimizer.step()
+                if out is None:
+                    print("Forward pass returned None")
+                if batch.train_mask is None or batch.y is None:
+                    print("Batch train_mask or y is None")
+                if batch.train_mask.any() and out[batch.train_mask].shape[0] != 0:
+                    loss = criterion(out[batch.train_mask], batch.y[batch.train_mask])
+                    total_loss += loss.item()
+                    acc += accuracy(out[batch.train_mask].argmax(dim=1), batch.y[batch.train_mask])
+                    loss.backward()
+                    optimizer.step()
 
-                # Validation
-                val_loss += criterion(out[batch.val_mask], batch.y[batch.val_mask])
-                val_acc += accuracy(out[batch.val_mask].argmax(dim=1), batch.y[batch.val_mask])
+                    # Validation
+                    val_loss += criterion(out[batch.val_mask], batch.y[batch.val_mask])
+                    val_acc += accuracy(out[batch.val_mask].argmax(dim=1), batch.y[batch.val_mask])
 
             # Print metrics every 10 epochs
             if epoch % 10 == 0:
