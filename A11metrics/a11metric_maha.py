@@ -12,6 +12,17 @@ import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity, manhattan_distances
 import numpy as np
 
+# 设置随机种子
+def set_seed(seed):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(42)
+
 load_dotenv()
 
 api_key = os.getenv("OPENAI_API_KEY")
@@ -184,4 +195,8 @@ print("Discrepancies between normal and impaired graphs (Manhattan):")
 for node, normal_dist, impaired_dist in discrepancies:
     print(f"Node {node}: Normal distance = {normal_dist:.2f}, Impaired distance = {impaired_dist:.2f}")
 
-# Visualize embeddi
+# # Visualize embeddings
+# visualize_embeddings(initial_normal_embeddings, "Initial Normal Embeddings")
+# visualize_embeddings(trained_normal_embeddings, "Trained Normal Embeddings")
+# visualize_embeddings(initial_impaired_embeddings, "Initial Impaired Embeddings")
+# visualize_embeddings(trained_impaired_embeddings, "Trained Impaired Embeddings")
